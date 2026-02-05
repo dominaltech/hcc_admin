@@ -1,13 +1,13 @@
 {
-  "name": "HCC School Admin Panel",
+ "name": "HCC School Admin Panel",
   "short_name": "HCC Admin",
   "description": "Admin panel for HCC High School management system",
-  "start_url": "/index.html",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#F9F3ED",
   "theme_color": "#220707",
-  "orientation": "portrait-primary",
-  "scope": "/",
+  "orientation": "any",
   "icons": [
     {
       "src": "admin.png",

@@ -800,6 +800,203 @@
                 padding: 0.75rem;
             }
         }
+
+
+
+
+
+
+
+        /* Admin Header Responsive Layout */
+.admin-header {
+    background: var(--white);
+    padding: 1rem 1.5rem;
+    box-shadow: 0 2px 10px rgba(34, 7, 7, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.admin-logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.admin-logo-box {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--maroon-primary), var(--maroon-dark));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.admin-title-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.admin-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+/* Action Buttons */
+.btn-action {
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.btn-install {
+    background: var(--maroon-primary);
+    color: var(--white);
+}
+
+.btn-install:hover {
+    background: var(--maroon-dark);
+    transform: translateY(-2px);
+}
+
+.btn-notification {
+    background: var(--success);
+    color: var(--white);
+}
+
+.btn-notification:hover {
+    background: #059669;
+    transform: translateY(-2px);
+}
+
+.btn-notification.disabled {
+    background: var(--neutral-warm);
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* User Info */
+.admin-user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.admin-user-name {
+    color: var(--maroon-dark);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.btn-logout {
+    padding: 0.6rem 1rem;
+    background: var(--danger);
+    color: var(--white);
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+    background: #dc2626;
+}
+
+/* Mobile Responsive */
+@media (max-width: 1024px) {
+    .admin-header {
+        padding: 1rem;
+    }
+
+    .admin-title {
+        font-size: 1rem;
+    }
+
+    .admin-title-section div:last-child {
+        font-size: 0.75rem;
+    }
+
+    .btn-action, .btn-logout {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0.75rem;
+    }
+
+    .admin-logo {
+        justify-content: center;
+    }
+
+    .admin-actions {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .admin-user-info {
+        width: 100%;
+        justify-content: space-between;
+        padding-top: 0.5rem;
+        border-top: 1px solid var(--neutral-light);
+    }
+
+    .admin-user-name {
+        display: none;
+    }
+
+    .btn-action {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .btn-logout {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn-action {
+        width: 100%;
+    }
+}
+
     </style>
 </head>
 <body>
@@ -831,37 +1028,40 @@
     <!-- Admin Dashboard -->
     <div class="admin-container" id="adminDashboard">
         <!-- Header -->
-        <header class="admin-header">
+       
+       <header class="admin-header">
     <div class="admin-logo">
         <div class="admin-logo-box">HCC</div>
-        <div>
+        <div class="admin-title-section">
             <div class="admin-title">HCC High School</div>
             <div style="font-size: 0.85rem; color: var(--neutral-warm);">Admin Panel</div>
         </div>
     </div>
     
-    <div class="admin-user">
-        <button id="notificationToggleBtn" 
-                onclick="toggleNotifications()" 
-                style="padding: 0.6rem 1.2rem;
-                       background: var(--maroon-primary);
-                       color: var(--white);
-                       border: none;
-                       border-radius: 6px;
-                       font-weight: 600;
-                       cursor: pointer;
-                       transition: all 0.3s ease;
-                       margin-right: 1rem;
-                       font-size: 0.9rem;">
-            🔕 Enable Notifications
+    <div class="admin-actions">
+        <!-- Install App Button -->
+        <button id="installAppBtn" 
+                onclick="installAdminApp()" 
+                class="btn-action btn-install"
+                style="display: none;">
+            📱 Install App
         </button>
-        <div>
+
+        <!-- Enable Notifications Button -->
+        <button id="notificationBtn" 
+                onclick="enableAdminNotifications()" 
+                class="btn-action btn-notification">
+            🔔 Enable Alerts
+        </button>
+
+        <!-- User Info & Logout -->
+        <div class="admin-user-info">
             <div class="admin-user-name" id="adminName">Admin</div>
-            <div style="font-size: 0.8rem; color: var(--neutral-warm);">Administrator</div>
+            <button class="btn-logout" onclick="logout()">Logout</button>
         </div>
-        <button class="btn-logout" onclick="logout()">Logout</button>
     </div>
 </header>
+
 
         <!-- Main Layout -->
         <div class="admin-layout">
@@ -2601,135 +2801,211 @@ async function testPushNotification() {
         });
     }
 
-    // ============================================
-    // ADMIN PUSH NOTIFICATION SETUP
-    // ============================================
-    const VAPID_PUBLIC_KEY = 'BMjWrT4Mo49qpPCXXx_qWNS8VJfVNE5-laD52FT-usDylWdolRBv4qU1EpzdwK-PUAqj2JKB4ZAFvfABhZxMyKs';
+   // ============================================
+// ADMIN PUSH NOTIFICATION SETUP
+// ============================================
+const VAPID_PUBLIC_KEY = 'BMjWrT4Mo49qpPCXXx_qWNS8VJfVNE5-laD52FT-usDylWdolRBv4qU1EpzdwK-PUAqj2JKB4ZAFvfABhZxMyKs';
 
-    function urlBase64ToUint8Array(base64String) {
-        const padding = '='.repeat((4 - base64String.length % 4) % 4);
-        const base64 = (base64String + padding)
-            .replace(/\-/g, '+')
-            .replace(/_/g, '/');
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+        .replace(/\-/g, '+')
+        .replace(/_/g, '/');
 
-        const rawData = window.atob(base64);
-        const outputArray = new Uint8Array(rawData.length);
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
 
-        for (let i = 0; i < rawData.length; ++i) {
-            outputArray[i] = rawData.charCodeAt(i);
-        }
-        return outputArray;
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+}
+
+// Enable Admin Notifications
+async function enableAdminNotifications() {
+    const btn = document.getElementById('notificationBtn');
+    
+    if (!('Notification' in window)) {
+        alert('❌ Notifications not supported in your browser');
+        return;
     }
 
-    async function subscribeAdminToNotifications() {
-        if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
-            alert('❌ Push notifications not supported in your browser');
-            return false;
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        alert('❌ Push notifications not supported in your browser');
+        return;
+    }
+
+    // Check if already enabled
+    const currentPermission = Notification.permission;
+    if (currentPermission === 'granted') {
+        const isSubscribed = localStorage.getItem('admin_notifications_enabled') === 'true';
+        if (isSubscribed) {
+            alert('✅ Notifications are already enabled!');
+            return;
+        }
+    }
+
+    try {
+        btn.disabled = true;
+        btn.innerHTML = '⏳ Enabling...';
+
+        const permission = await Notification.requestPermission();
+        
+        if (permission !== 'granted') {
+            alert('❌ Notification permission denied.\n\nTo enable:\n1. Click the lock icon in address bar\n2. Allow notifications\n3. Click the button again');
+            btn.disabled = false;
+            btn.innerHTML = '🔔 Enable Alerts';
+            return;
         }
 
-        try {
-            const permission = await Notification.requestPermission();
+        // Subscribe to push
+        const registration = await navigator.serviceWorker.ready;
+        
+        let subscription = await registration.pushManager.getSubscription();
+
+        if (!subscription) {
+            subscription = await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+            });
+        }
+
+        // Save to database
+        const subscriptionJson = subscription.toJSON();
+
+        const { error } = await supabaseClient
+            .from('push_subscriptions')
+            .upsert({
+                endpoint: subscription.endpoint,
+                p256dh: subscriptionJson.keys.p256dh,
+                auth: subscriptionJson.keys.auth,
+                user_agent: 'Admin - ' + navigator.userAgent,
+                device_type: 'admin',
+                is_active: true,
+                last_used: new Date().toISOString()
+            }, {
+                onConflict: 'endpoint'
+            });
+
+        if (error) throw error;
+
+        localStorage.setItem('admin_notifications_enabled', 'true');
+        
+        btn.innerHTML = '✅ Alerts Enabled';
+        btn.classList.add('disabled');
+        btn.disabled = true;
+        btn.style.background = 'var(--neutral-warm)';
+
+        alert('✅ Success!\n\nYou will now receive notifications for:\n• New admission inquiries\n• Important updates');
+
+    } catch (error) {
+        console.error('❌ Failed to enable notifications:', error);
+        alert('❌ Failed to enable notifications.\n\nError: ' + error.message);
+        btn.disabled = false;
+        btn.innerHTML = '🔔 Enable Alerts';
+    }
+}
+
+// Update notification button state
+function updateNotificationButton() {
+    const btn = document.getElementById('notificationBtn');
+    if (!btn) return;
+
+    const isEnabled = localStorage.getItem('admin_notifications_enabled') === 'true' && 
+                      Notification.permission === 'granted';
+
+    if (isEnabled) {
+        btn.innerHTML = '✅ Alerts Enabled';
+        btn.classList.add('disabled');
+        btn.disabled = true;
+        btn.style.background = 'var(--neutral-warm)';
+    } else {
+        btn.innerHTML = '🔔 Enable Alerts';
+        btn.classList.remove('disabled');
+        btn.disabled = false;
+        btn.style.background = 'var(--success)';
+    }
+}
+
+// ============================================
+// PWA INSTALL PROMPT FOR ADMIN
+// ============================================
+let deferredInstallPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    
+    // Show install button
+    const installBtn = document.getElementById('installAppBtn');
+    if (installBtn) {
+        installBtn.style.display = 'flex';
+    }
+});
+
+// Install Admin App
+async function installAdminApp() {
+    if (!deferredInstallPrompt) {
+        alert('ℹ️ App is already installed or installation is not available on this device.');
+        return;
+    }
+
+    const installBtn = document.getElementById('installAppBtn');
+    
+    try {
+        installBtn.disabled = true;
+        installBtn.innerHTML = '⏳ Installing...';
+
+        deferredInstallPrompt.prompt();
+        const { outcome } = await deferredInstallPrompt.userChoice;
+
+        if (outcome === 'accepted') {
+            console.log('✅ Admin app installed');
+            installBtn.style.display = 'none';
             
-            if (permission !== 'granted') {
-                alert('❌ Notification permission denied. You will not receive inquiry alerts.');
-                return false;
-            }
-
-            const registration = await navigator.serviceWorker.ready;
-            
-            let subscription = await registration.pushManager.getSubscription();
-
-            if (!subscription) {
-                subscription = await registration.pushManager.subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-                });
-            }
-
-            // Save admin subscription
-            const subscriptionJson = subscription.toJSON();
-
-            const { error } = await supabaseClient
-                .from('push_subscriptions')
-                .upsert({
-                    endpoint: subscription.endpoint,
-                    p256dh: subscriptionJson.keys.p256dh,
-                    auth: subscriptionJson.keys.auth,
-                    user_agent: 'Admin Panel - ' + navigator.userAgent,
-                    device_type: 'admin',
-                    is_active: true,
-                    last_used: new Date().toISOString()
-                }, {
-                    onConflict: 'endpoint'
-                });
-
-            if (error) {
-                console.error('❌ Failed to save admin subscription:', error);
-                throw error;
-            }
-
-            alert('✅ Notifications enabled! You will receive alerts for new inquiries.');
-            localStorage.setItem('admin_notifications_enabled', 'true');
-            updateNotificationButton();
-            return true;
-
-        } catch (error) {
-            console.error('❌ Failed to subscribe admin:', error);
-            alert('❌ Failed to enable notifications: ' + error.message);
-            return false;
-        }
-    }
-
-    async function unsubscribeAdminNotifications() {
-        try {
-            const registration = await navigator.serviceWorker.ready;
-            const subscription = await registration.pushManager.getSubscription();
-
-            if (subscription) {
-                await subscription.unsubscribe();
-                
-                await supabaseClient
-                    .from('push_subscriptions')
-                    .update({ is_active: false })
-                    .eq('endpoint', subscription.endpoint);
-            }
-
-            localStorage.setItem('admin_notifications_enabled', 'false');
-            alert('✅ Notifications disabled');
-            updateNotificationButton();
-        } catch (error) {
-            console.error('❌ Failed to unsubscribe:', error);
-        }
-    }
-
-    function updateNotificationButton() {
-        const btn = document.getElementById('notificationToggleBtn');
-        if (!btn) return;
-
-        const isEnabled = localStorage.getItem('admin_notifications_enabled') === 'true' || 
-                          Notification.permission === 'granted';
-
-        if (isEnabled) {
-            btn.innerHTML = '🔔 Notifications ON';
-            btn.style.background = 'var(--success)';
-        } else {
-            btn.innerHTML = '🔕 Enable Notifications';
-            btn.style.background = 'var(--maroon-primary)';
-        }
-    }
-
-    // Auto-subscribe after login
-    window.addEventListener('DOMContentLoaded', () => {
-        const session = localStorage.getItem('adminSession');
-        if (session && Notification.permission === 'default') {
+            // Auto-prompt for notifications after install
             setTimeout(() => {
-                if (confirm('Enable push notifications to receive new inquiry alerts?')) {
-                    subscribeAdminToNotifications();
+                if (Notification.permission === 'default') {
+                    if (confirm('Enable notifications to receive inquiry alerts?')) {
+                        enableAdminNotifications();
+                    }
                 }
-            }, 2000);
+            }, 1500);
+        } else {
+            installBtn.disabled = false;
+            installBtn.innerHTML = '📱 Install App';
         }
-        updateNotificationButton();
-    });
+
+        deferredInstallPrompt = null;
+
+    } catch (error) {
+        console.error('Install error:', error);
+        installBtn.disabled = false;
+        installBtn.innerHTML = '📱 Install App';
+    }
+}
+
+// Check if already installed
+window.addEventListener('appinstalled', () => {
+    console.log('✅ Admin app installed');
+    const installBtn = document.getElementById('installAppBtn');
+    if (installBtn) {
+        installBtn.style.display = 'none';
+    }
+});
+
+// Hide install button if already installed
+if (window.matchMedia('(display-mode: standalone)').matches) {
+    const installBtn = document.getElementById('installAppBtn');
+    if (installBtn) {
+        installBtn.style.display = 'none';
+    }
+}
+
+// Initialize on load
+window.addEventListener('DOMContentLoaded', () => {
+    updateNotificationButton();
+});
 
 
     // ============================================

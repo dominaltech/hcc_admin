@@ -5,6 +5,12 @@
 [build.environment]
   NODE_VERSION = "18"
 
+# Enable scheduled functions
+[functions]
+  # Check for pending notifications every 2 minutes
+  [[functions.check-pending-notifications]]
+    schedule = "*/2 * * * *"
+
 [[redirects]]
   from = "/api/send-push"
   to = "/.netlify/functions/send-push"
@@ -14,16 +20,9 @@
   for = "/*"
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
-    Pragma = "no-cache"
-    Expires = "0"
 
 [[headers]]
   for = "/sw.js"
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
     Service-Worker-Allowed = "/"
-
-[[headers]]
-  for = "/manifest.json"
-  [headers.values]
-    Cache-Control = "no-cache, no-store, must-revalidate"

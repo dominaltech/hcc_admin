@@ -1342,6 +1342,36 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
+
+
+// ============================================
+// FORCE SERVICE WORKER UPDATE
+// ============================================
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(registrations => {
+        registrations.forEach(registration => {
+            registration.unregister();
+            console.log('🔄 Service Worker unregistered');
+        });
+    });
+    
+    // Clear all caches
+    caches.keys().then(keys => {
+        keys.forEach(key => {
+            caches.delete(key);
+            console.log('🗑️ Cache deleted:', key);
+        });
+    });
+}
+
+// Force reload after clearing cache (only once)
+if (!sessionStorage.getItem('cache_cleared')) {
+    sessionStorage.setItem('cache_cleared', 'true');
+    setTimeout(() => {
+        location.reload(true);
+    }, 500);
+}
+
         // ============================================
         // SUPABASE CONFIGURATION
         // ============================================
@@ -1695,7 +1725,6 @@
 // ============================================
 // STAFF MANAGEMENT - COMPLETE FUNCTIONS
 // ============================================
-
 async function loadStaff() {
     try {
         const { data: staff, error } = await supabaseClient
@@ -1704,6 +1733,12 @@ async function loadStaff() {
             .order('display_order', { ascending: true });
 
         if (error) throw error;
+
+        // DEBUG: Log the first staff member to see field names
+        if (staff && staff.length > 0) {
+            console.log('📋 First staff member:', staff[0]);
+            console.log('📋 Field names:', Object.keys(staff[0]));
+        }
 
         const container = document.getElementById('staffTable');
         
@@ -1729,11 +1764,11 @@ async function loadStaff() {
                     ${staff.map(s => `
                         <tr>
                             <td>${s.photo_url ? `<img src="${s.photo_url}" class="image-preview" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">` : '👤'}</td>
-                            <td>${s.full_name}</td>
+                            <td>${s.full_name || 'No name'}</td>
                             <td>${s.qualification || '-'}</td>
                             <td>${s.designation || '-'}</td>
                             <td>${s.experience_years || '-'}</td>
-                            <td>${s.display_order}</td>
+                            <td>${s.display_order || 0}</td>
                             <td>
                                 <button class="btn-icon btn-edit" onclick='editStaff(${JSON.stringify(s).replace(/'/g, "&#39;")})'>✏️</button>
                                 <button class="btn-icon btn-delete" onclick="deleteStaff('${s.id}', '${s.photo_url || ''}')">🗑️</button>

@@ -2517,6 +2517,35 @@
         }
     });
 
+    // Add this function to admin.html script section
+async function testPushNotification() {
+    if (!confirm('Send push notification to all subscribers?')) return;
+
+    try {
+        const response = await fetch('/api/send-push', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                type: 'pending'
+            })
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(`✅ Success!\n\nSent: ${result.sent} notifications\nTo: ${result.subscribers} subscribers`);
+            loadNotifications();
+        } else {
+            alert('❌ Failed to send notifications');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Failed to send notifications');
+    }
+}
+
     </script>
 </body>
 </html>

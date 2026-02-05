@@ -1343,34 +1343,37 @@
 
     <script>
 
-
 // ============================================
-// FORCE SERVICE WORKER UPDATE
+// ULTRA-FRESH MODE - NO CACHING EVER
 // ============================================
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then(registrations => {
-        registrations.forEach(registration => {
-            registration.unregister();
-            console.log('🔄 Service Worker unregistered');
-        });
-    });
+(async function ultraFreshMode() {
+    if ('serviceWorker' in navigator) {
+        // Unregister ALL service workers
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (let registration of registrations) {
+            await registration.unregister();
+        }
+        
+        // Clear ALL caches
+        const cacheKeys = await caches.keys();
+        for (let key of cacheKeys) {
+            await caches.delete(key);
+        }
+    }
     
-    // Clear all caches
-    caches.keys().then(keys => {
-        keys.forEach(key => {
-            caches.delete(key);
-            console.log('🗑️ Cache deleted:', key);
-        });
-    });
-}
+    // Force reload once to clear any browser cache
+    if (!sessionStorage.getItem('fresh_loaded')) {
+        sessionStorage.setItem('fresh_loaded', 'true');
+        setTimeout(() => location.reload(true), 300);
+    }
+    
+    console.log('✅ Ultra-fresh mode active');
+})();
 
-// Force reload after clearing cache (only once)
-if (!sessionStorage.getItem('cache_cleared')) {
-    sessionStorage.setItem('cache_cleared', 'true');
-    setTimeout(() => {
-        location.reload(true);
-    }, 500);
-}
+// Clear the flag when user navigates away
+window.addEventListener('beforeunload', () => {
+    sessionStorage.removeItem('fresh_loaded');
+});
 
         // ============================================
         // SUPABASE CONFIGURATION
@@ -3045,41 +3048,7 @@ async function deleteBlog(id, imageUrl) {
     // ============================================
     // ADMIN SERVICE WORKER REGISTRATION
     // ============================================
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')
-                .then((registration) => {
-                    console.log('✅ Admin SW registered:', registration.scope);
-
-                    // Check for updates every 10 minutes
-                    setInterval(() => {
-                        registration.update();
-                    }, 10 * 60 * 1000);
-
-                    // Listen for updates
-                    registration.addEventListener('updatefound', () => {
-                        const newWorker = registration.installing;
-                        newWorker.addEventListener('statechange', () => {
-                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                if (confirm('New version available! Reload to update?')) {
-                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
-                                    window.location.reload();
-                                }
-                            }
-                        });
-                    });
-                })
-                .catch((error) => {
-                    console.error('❌ Admin SW registration failed:', error);
-                });
-
-            // Reload when new SW takes control
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                window.location.reload();
-            });
-        });
-    }
-
+   
     // ============================================
     // PUSH NOTIFICATION SUBSCRIPTION FOR ADMIN
     // ============================================
@@ -3205,41 +3174,7 @@ async function testPushNotification() {
     // ============================================
     // ADMIN SERVICE WORKER REGISTRATION
     // ============================================
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')
-                .then((registration) => {
-                    console.log('✅ Admin SW registered:', registration.scope);
-
-                    // Check for updates every 10 minutes
-                    setInterval(() => {
-                        registration.update();
-                    }, 10 * 60 * 1000);
-
-                    // Listen for updates
-                    registration.addEventListener('updatefound', () => {
-                        const newWorker = registration.installing;
-                        newWorker.addEventListener('statechange', () => {
-                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                if (confirm('New version available! Reload to update?')) {
-                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
-                                    window.location.reload();
-                                }
-                            }
-                        });
-                    });
-                })
-                .catch((error) => {
-                    console.error('❌ Admin SW registration failed:', error);
-                });
-
-            // Reload when new SW takes control
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                window.location.reload();
-            });
-        });
-    }
-
+  
    // ============================================
 // ADMIN PUSH NOTIFICATION SETUP
 // ============================================
@@ -3594,39 +3529,6 @@ function showImagePreview(file, previewElementId) {
     };
     reader.readAsDataURL(file);
 }
-
- if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')
-                .then((registration) => {
-                    console.log('✅ SW registered:', registration.scope);
-
-                    // Check for updates every 5 minutes
-                    setInterval(() => {
-                        registration.update();
-                    }, 5 * 60 * 1000);
-
-                    // Listen for updates
-                    registration.addEventListener('updatefound', () => {
-                        const newWorker = registration.installing;
-                        newWorker.addEventListener('statechange', () => {
-                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                if (confirm('New version available! Reload to update?')) {
-                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
-                                    window.location.reload();
-                                }
-                            }
-                        });
-                    });
-                })
-                .catch((error) => console.error('❌ SW registration failed:', error));
-
-            // Reload when new SW takes control
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                window.location.reload();
-            });
-        });
-    }
 
     </script>
 </body>

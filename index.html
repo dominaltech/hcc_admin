@@ -1,0 +1,2522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Admin Panel - HCC High School Management System">
+    <meta name="theme-color" content="#220707">
+    <meta name="robots" content="noindex, nofollow">
+    <!-- PWA Manifest for Admin -->
+<link rel="manifest" href="/admin-manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HCC Admin">
+<link rel="apple-touch-icon" href="/icons/admin-icon-192x192.png">
+
+    <title>Admin Panel | HCC High School</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --maroon-dark: #220707;
+            --maroon-primary: #531C22;
+            --neutral-warm: #AC9185;
+            --neutral-light: #E7D8CA;
+            --bg-light: #F9F3ED;
+            --white: #FFFFFF;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--maroon-dark);
+            line-height: 1.6;
+        }
+
+        /* Login Screen */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .login-box {
+            background: var(--white);
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(34, 7, 7, 0.15);
+            width: 100%;
+            max-width: 450px;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--maroon-primary), var(--maroon-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--white);
+            font-weight: bold;
+            margin: 0 auto 2rem;
+        }
+
+        .login-title {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--maroon-dark);
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: var(--neutral-warm);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--maroon-dark);
+            font-weight: 600;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--neutral-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--maroon-primary);
+            box-shadow: 0 0 0 3px rgba(83, 28, 34, 0.1);
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: var(--maroon-primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--maroon-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(83, 28, 34, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--neutral-light);
+            color: var(--maroon-dark);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .error-message {
+            background: #fee;
+            color: var(--danger);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background: #d1fae5;
+            color: var(--success);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        /* Admin Dashboard */
+        .admin-container {
+            display: none;
+        }
+
+        .admin-container.show {
+            display: block;
+        }
+
+        /* Header */
+        .admin-header {
+            background: var(--white);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(34, 7, 7, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-logo-box {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--maroon-primary), var(--maroon-dark));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+        }
+
+        .admin-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-user-name {
+            color: var(--neutral-warm);
+            font-size: 0.9rem;
+        }
+
+        .btn-logout {
+            padding: 0.6rem 1.2rem;
+            background: var(--danger);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: #dc2626;
+        }
+
+        /* Layout */
+        .admin-layout {
+            display: flex;
+            min-height: calc(100vh - 76px);
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            width: 260px;
+            background: var(--white);
+            padding: 2rem 0;
+            box-shadow: 2px 0 10px rgba(34, 7, 7, 0.05);
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            color: var(--neutral-warm);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background: var(--bg-light);
+            color: var(--maroon-primary);
+            border-right: 3px solid var(--maroon-primary);
+        }
+
+        .sidebar-icon {
+            font-size: 1.2rem;
+        }
+
+        /* Main Content */
+        .admin-main {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: var(--maroon-dark);
+        }
+
+        .btn-add {
+            padding: 0.8rem 1.5rem;
+            background: var(--maroon-primary);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add:hover {
+            background: var(--maroon-dark);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(34, 7, 7, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(83, 28, 34, 0.15);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .stat-icon.primary { background: rgba(83, 28, 34, 0.1); color: var(--maroon-primary); }
+        .stat-icon.success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .stat-icon.warning { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .stat-icon.danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--maroon-dark);
+        }
+
+        .stat-label {
+            color: var(--neutral-warm);
+            font-size: 0.9rem;
+        }
+
+        /* Table */
+        .data-table {
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(34, 7, 7, 0.08);
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            background: var(--bg-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .search-box {
+            padding: 0.6rem 1rem;
+            border: 2px solid var(--neutral-light);
+            border-radius: 6px;
+            width: 300px;
+            max-width: 100%;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--bg-light);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--maroon-dark);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 1rem;
+            border-top: 1px solid var(--neutral-light);
+        }
+
+        tr:hover {
+            background: var(--bg-light);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .badge-warning { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .badge-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .badge-primary { background: rgba(83, 28, 34, 0.1); color: var(--maroon-primary); }
+
+        .btn-icon {
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 0.5rem;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-view {
+            background: rgba(83, 28, 34, 0.1);
+            color: var(--maroon-primary);
+        }
+
+        .btn-edit {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .btn-delete {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .btn-icon:hover {
+            transform: scale(1.1);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(34, 7, 7, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--maroon-dark);
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--neutral-warm);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-close:hover {
+            color: var(--maroon-dark);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        select {
+            padding: 1rem;
+            border: 2px solid var(--neutral-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            width: 100%;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        /* Image Preview */
+        .image-preview {
+            width: 100%;
+            max-width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border: 2px solid var(--neutral-light);
+        }
+
+        .image-preview-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .btn-remove-image {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            display: none;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 1rem;
+            background: var(--bg-light);
+            border: 2px dashed var(--neutral-light);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-input-label:hover {
+            border-color: var(--maroon-primary);
+            background: rgba(83, 28, 34, 0.05);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--neutral-warm);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--neutral-warm);
+        }
+
+        .spinner {
+            border: 3px solid var(--neutral-light);
+            border-top: 3px solid var(--maroon-primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 968px) {
+            .admin-header {
+                padding: 1rem;
+            }
+
+            .admin-logo span {
+                display: none;
+            }
+
+            .admin-user-name {
+                display: none;
+            }
+
+            .admin-layout {
+                flex-direction: column;
+            }
+
+            .admin-sidebar {
+                width: 100%;
+                padding: 1rem 0;
+                display: flex;
+                overflow-x: auto;
+            }
+
+            .sidebar-nav {
+                display: flex;
+                gap: 0.5rem;
+                padding: 0 1rem;
+            }
+
+            .sidebar-item {
+                margin: 0;
+            }
+
+            .sidebar-link {
+                padding: 0.8rem 1rem;
+                white-space: nowrap;
+                border-right: none;
+                border-bottom: 3px solid transparent;
+            }
+
+            .sidebar-link.active {
+                border-right: none;
+                border-bottom: 3px solid var(--maroon-primary);
+            }
+
+            .admin-main {
+                padding: 1rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .stat-card {
+                padding: 1.5rem;
+            }
+
+            .stat-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+
+            .stat-number {
+                font-size: 1.5rem;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-container" id="loginScreen">
+        <div class="login-box">
+            <div class="login-logo">HCC</div>
+            <h1 class="login-title">Admin Panel</h1>
+            <p class="login-subtitle">HCC High School Management System</p>
+            
+            <div class="error-message" id="loginError"></div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-input" id="username" required autocomplete="username">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="password" required autocomplete="current-password">
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div class="admin-container" id="adminDashboard">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="admin-logo">
+                <div class="admin-logo-box">HCC</div>
+                <div>
+                    <div class="admin-title">HCC High School</div>
+                    <div style="font-size: 0.85rem; color: var(--neutral-warm);">Admin Panel</div>
+                </div>
+            </div>
+            
+            <div class="admin-user">
+                <div>
+                    <div class="admin-user-name" id="adminName">Admin</div>
+                    <div style="font-size: 0.8rem; color: var(--neutral-warm);">Administrator</div>
+                </div>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </div>
+        </header>
+
+        <!-- Main Layout -->
+        <div class="admin-layout">
+            <!-- Sidebar -->
+            <aside class="admin-sidebar">
+                <ul class="sidebar-nav">
+                    <li class="sidebar-item">
+                        <a class="sidebar-link active" data-section="dashboard">
+                            <span class="sidebar-icon">📊</span>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" data-section="inquiries">
+                            <span class="sidebar-icon">📝</span>
+                            <span>Inquiries</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" data-section="staff">
+                            <span class="sidebar-icon">👥</span>
+                            <span>Staff</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" data-section="infrastructure">
+                            <span class="sidebar-icon">🏢</span>
+                            <span>Infrastructure</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" data-section="gallery">
+                            <span class="sidebar-icon">🖼️</span>
+                            <span>Gallery</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" data-section="achievements">
+                            <span class="sidebar-icon">🏆</span>
+                            <span>Achievements</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" data-section="blogs">
+                            <span class="sidebar-icon">📢</span>
+                            <span>Notices</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" data-section="notifications">
+                            <span class="sidebar-icon">🔔</span>
+                            <span>Notifications</span>
+                        </a>
+                    </li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="admin-main">
+                <!-- Dashboard Section -->
+                <section class="content-section active" id="dashboard">
+                    <div class="section-header">
+                        <h2 class="section-title">Dashboard</h2>
+                    </div>
+
+                    <div class="stats-grid" id="statsGrid">
+                        <div class="loading"><div class="spinner"></div><p>Loading statistics...</p></div>
+                    </div>
+
+                    <div class="data-table">
+                        <div class="table-header">
+                            <h3 class="table-title">Recent Admission Inquiries</h3>
+                        </div>
+                        <div class="table-container" id="recentInquiries">
+                            <div class="loading"><div class="spinner"></div><p>Loading...</p></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Admission Inquiries Section -->
+                <section class="content-section" id="inquiries">
+                    <div class="section-header">
+                        <h2 class="section-title">Admission Inquiries</h2>
+                    </div>
+
+                    <div class="data-table">
+                        <div class="table-header">
+                            <h3 class="table-title">All Inquiries</h3>
+                            <input type="text" class="search-box" id="searchInquiries" placeholder="Search inquiries..." onkeyup="filterTable('inquiriesTable', this.value)">
+                        </div>
+                        <div class="table-container" id="inquiriesTable">
+                            <div class="loading"><div class="spinner"></div><p>Loading inquiries...</p></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Staff Section -->
+                <section class="content-section" id="staff">
+                    <div class="section-header">
+                        <h2 class="section-title">Staff Management</h2>
+                        <button class="btn-add" onclick="openStaffModal()">+ Add Staff</button>
+                    </div>
+
+                    <div class="data-table">
+                        <div class="table-header">
+                            <h3 class="table-title">All Staff Members</h3>
+                            <input type="text" class="search-box" id="searchStaff" placeholder="Search staff..." onkeyup="filterTable('staffTable', this.value)">
+                        </div>
+                        <div class="table-container" id="staffTable">
+                            <div class="loading"><div class="spinner"></div><p>Loading staff...</p></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Infrastructure Section -->
+                <section class="content-section" id="infrastructure">
+                    <div class="section-header">
+                        <h2 class="section-title">Infrastructure</h2>
+                        <button class="btn-add" onclick="openInfraModal()">+ Add Infrastructure</button>
+                    </div>
+
+                    <div class="data-table">
+                        <div class="table-header">
+                            <h3 class="table-title">All Infrastructure</h3>
+                            <input type="text" class="search-box" id="searchInfra" placeholder="Search..." onkeyup="filterTable('infraTable', this.value)">
+                        </div>
+                        <div class="table-container" id="infraTable">
+                            <div class="loading"><div class="spinner"></div><p>Loading...</p></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Gallery Section -->
+                <section class="content-section" id="gallery">
+                    <div class="section-header">
+                        <h2 class="section-title">Gallery</h2>
+                        <button class="btn-add" onclick="openGalleryModal()">+ Add Image</button>
+                    </div>
+
+                    <div class="data-table">
+                        <div class="table-header">
+                            <h3 class="table-title">All Gallery Images</h3>
+                            <input type="text" class="search-box" id="searchGallery" placeholder="Search..." onkeyup="filterTable('galleryTable', this.value)">
+                        </div>
+                        <div class="table-container" id="galleryTable">
+                            <div class="loading"><div class="spinner"></div><p>Loading...</p></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Achievements Section -->
+                <section class="content-section" id="achievements">
+                    <div class="section-header">
+                        <h2 class="section-title">Achievements</h2>
+                        <button class="btn-add" onclick="openAchievementModal()">+ Add Achievement</button>
+                    </div>
+
+                    <div class="data-table">
+                        <div class="table-header">
+                            <h3 class="table-title">All Achievements</h3>
+                            <input type="text" class="search-box" id="searchAchievements" placeholder="Search..." onkeyup="filterTable('achievementsTable', this.value)">
+                        </div>
+                        <div class="table-container" id="achievementsTable">
+                            <div class="loading"><div class="spinner"></div><p>Loading...</p></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Blogs Section -->
+                <section class="content-section" id="blogs">
+                    <div class="section-header">
+                        <h2 class="section-title">Notices & Blogs</h2>
+                        <button class="btn-add" onclick="openBlogModal()">+ Add Notice</button>
+                    </div>
+
+                    <div class="data-table">
+                        <div class="table-header">
+                            <h3 class="table-title">All Notices</h3>
+                            <input type="text" class="search-box" id="searchBlogs" placeholder="Search..." onkeyup="filterTable('blogsTable', this.value)">
+                        </div>
+                        <div class="table-container" id="blogsTable">
+                            <div class="loading"><div class="spinner"></div><p>Loading...</p></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Notifications Section -->
+                <section class="content-section" id="notifications">
+                    <div class="section-header">
+                        <h2 class="section-title">Push Notifications</h2>
+                        <button class="btn-add" onclick="sendTestNotification()">🔔 Send Test</button>
+                    </div>
+
+                    <div class="data-table">
+                        <div class="table-header">
+                            <h3 class="table-title">Notification Log</h3>
+                        </div>
+                        <div class="table-container" id="notificationsTable">
+                            <div class="loading"><div class="spinner"></div><p>Loading...</p></div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals will be created dynamically -->
+
+    <!-- Supabase JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // ============================================
+        // SUPABASE CONFIGURATION
+        // ============================================
+        const SUPABASE_URL = 'https://tqpjyqrlawhjuzugosyh.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRxcGp5cXJsYXdoanV6dWdvc3loIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxOTI4NzQsImV4cCI6MjA4NTc2ODg3NH0.Qsajz9iar_Qu0N7UHTm5ltjnUtVzNSpapJf1xnqGJLQ';
+
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentAdmin = null;
+        let currentEditItem = null;
+
+        // ============================================
+        // LOGIN FUNCTIONALITY
+        // ============================================
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+
+            try {
+                const { data: admin, error } = await supabaseClient
+                    .from('admins')
+                    .select('*')
+                    .eq('username', username)
+                    .eq('password', password)
+                    .eq('is_active', true)
+                    .single();
+
+                if (error || !admin) {
+                    errorDiv.textContent = 'Invalid username or password';
+                    errorDiv.classList.add('show');
+                    return;
+                }
+
+                currentAdmin = admin;
+                localStorage.setItem('adminSession', JSON.stringify(admin));
+                
+                await supabaseClient
+                    .from('admins')
+                    .update({ last_login: new Date().toISOString() })
+                    .eq('id', admin.id);
+
+                showDashboard();
+
+            } catch (err) {
+                console.error('Login error:', err);
+                errorDiv.textContent = 'Login failed. Please try again.';
+                errorDiv.classList.add('show');
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const session = localStorage.getItem('adminSession');
+            if (session) {
+                currentAdmin = JSON.parse(session);
+                showDashboard();
+            }
+        });
+
+        function showDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('adminDashboard').classList.add('show');
+            document.getElementById('adminName').textContent = currentAdmin.full_name;
+            
+            loadDashboardStats();
+            loadRecentInquiries();
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('adminSession');
+                currentAdmin = null;
+                window.location.reload();
+            }
+        }
+
+        // ============================================
+        // NAVIGATION
+        // ============================================
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = link.getAttribute('data-section');
+                
+                document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                
+                document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+                document.getElementById(section).classList.add('active');
+                
+                loadSectionData(section);
+            });
+        });
+
+        function loadSectionData(section) {
+            switch(section) {
+                case 'dashboard':
+                    loadDashboardStats();
+                    loadRecentInquiries();
+                    break;
+                case 'inquiries':
+                    loadAllInquiries();
+                    break;
+                case 'staff':
+                    loadStaff();
+                    break;
+                case 'infrastructure':
+                    loadInfrastructure();
+                    break;
+                case 'gallery':
+                    loadGallery();
+                    break;
+                case 'achievements':
+                    loadAchievements();
+                    break;
+                case 'blogs':
+                    loadBlogs();
+                    break;
+                case 'notifications':
+                    loadNotifications();
+                    break;
+            }
+        }
+
+        // ============================================
+        // DASHBOARD STATS
+        // ============================================
+        async function loadDashboardStats() {
+            try {
+                const { data: stats, error } = await supabaseClient
+                    .rpc('get_admin_dashboard_stats');
+
+                if (error) throw error;
+
+                const statsGrid = document.getElementById('statsGrid');
+                statsGrid.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-icon primary">📝</div>
+                        <div class="stat-info">
+                            <div class="stat-number">${stats.total_inquiries || 0}</div>
+                            <div class="stat-label">Total Inquiries</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon warning">⏳</div>
+                        <div class="stat-info">
+                            <div class="stat-number">${stats.pending_inquiries || 0}</div>
+                            <div class="stat-label">Pending Inquiries</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon success">👥</div>
+                        <div class="stat-info">
+                            <div class="stat-number">${stats.total_staff || 0}</div>
+                            <div class="stat-label">Staff Members</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon primary">🏆</div>
+                        <div class="stat-info">
+                            <div class="stat-number">${stats.total_achievements || 0}</div>
+                            <div class="stat-label">Achievements</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon success">🖼️</div>
+                        <div class="stat-info">
+                            <div class="stat-number">${stats.total_gallery_images || 0}</div>
+                            <div class="stat-label">Gallery Images</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon warning">🏢</div>
+                        <div class="stat-info">
+                            <div class="stat-number">${stats.total_infrastructure || 0}</div>
+                            <div class="stat-label">Infrastructure</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon primary">📢</div>
+                        <div class="stat-info">
+                            <div class="stat-number">${stats.total_blogs || 0}</div>
+                            <div class="stat-label">Notices</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon danger">🔔</div>
+                        <div class="stat-info">
+                            <div class="stat-number">${stats.unread_notifications || 0}</div>
+                            <div class="stat-label">Pending Notifications</div>
+                        </div>
+                    </div>
+                `;
+            } catch (err) {
+                console.error('Error loading stats:', err);
+            }
+        }
+
+        // ============================================
+        // RECENT INQUIRIES
+        // ============================================
+        async function loadRecentInquiries() {
+            try {
+                const { data: inquiries, error } = await supabaseClient
+                    .from('admission_inquiries')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                if (error) throw error;
+
+                const container = document.getElementById('recentInquiries');
+                
+                if (!inquiries || inquiries.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No inquiries yet</div>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Parent Name</th>
+                                <th>Mobile</th>
+                                <th>Class</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${inquiries.map(inq => `
+                                <tr>
+                                    <td>${inq.student_name}</td>
+                                    <td>${inq.parent_name}</td>
+                                    <td>${inq.mobile_number}</td>
+                                    <td>${inq.class_applying_for}</td>
+                                    <td>${new Date(inq.created_at).toLocaleDateString()}</td>
+                                    <td><span class="badge badge-${inq.status === 'pending' ? 'warning' : 'success'}">${inq.status}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (err) {
+                console.error('Error loading inquiries:', err);
+            }
+        }
+
+        // ============================================
+        // LOAD ALL INQUIRIES
+        // ============================================
+        async function loadAllInquiries() {
+            try {
+                const { data: inquiries, error } = await supabaseClient
+                    .from('admission_inquiries')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                const container = document.getElementById('inquiriesTable');
+                
+                if (!inquiries || inquiries.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No inquiries found</div>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Parent Name</th>
+                                <th>Mobile</th>
+                                <th>Email</th>
+                                <th>Class</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${inquiries.map(inq => `
+                                <tr>
+                                    <td>${inq.student_name}</td>
+                                    <td>${inq.parent_name}</td>
+                                    <td>${inq.mobile_number}</td>
+                                    <td>${inq.email || '-'}</td>
+                                    <td>${inq.class_applying_for}</td>
+                                    <td>${new Date(inq.created_at).toLocaleString()}</td>
+                                    <td><span class="badge badge-${inq.status === 'pending' ? 'warning' : 'success'}">${inq.status}</span></td>
+                                    <td>
+                                        <button class="btn-icon btn-view" onclick='viewInquiry(${JSON.stringify(inq)})'>👁️</button>
+                                        <button class="btn-icon btn-delete" onclick="deleteInquiry('${inq.id}')">🗑️</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (err) {
+                console.error('Error loading inquiries:', err);
+            }
+        }
+
+        function viewInquiry(inquiry) {
+            const modal = createModal('Inquiry Details', `
+                <div style="line-height: 2;">
+                    <p><strong>Student Name:</strong> ${inquiry.student_name}</p>
+                    <p><strong>Parent Name:</strong> ${inquiry.parent_name}</p>
+                    <p><strong>Mobile:</strong> ${inquiry.mobile_number}</p>
+                    <p><strong>Email:</strong> ${inquiry.email || 'Not provided'}</p>
+                    <p><strong>Class Applying For:</strong> ${inquiry.class_applying_for}</p>
+                    <p><strong>Previous School:</strong> ${inquiry.previous_school || 'Not provided'}</p>
+                    <p><strong>Address:</strong> ${inquiry.address || 'Not provided'}</p>
+                    <p><strong>Message:</strong> ${inquiry.message || 'No message'}</p>
+                    <p><strong>Date:</strong> ${new Date(inquiry.created_at).toLocaleString()}</p>
+                    <p><strong>Status:</strong> <span class="badge badge-${inquiry.status === 'pending' ? 'warning' : 'success'}">${inquiry.status}</span></p>
+                </div>
+            `);
+            modal.show();
+        }
+
+        async function deleteInquiry(id) {
+            if (!confirm('Are you sure you want to delete this inquiry?')) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('admission_inquiries')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                alert('Inquiry deleted successfully');
+                loadAllInquiries();
+                loadDashboardStats();
+            } catch (err) {
+                console.error('Error deleting inquiry:', err);
+                alert('Failed to delete inquiry');
+            }
+        }
+
+        // ============================================
+        // STAFF MANAGEMENT
+        // ============================================
+        async function loadStaff() {
+            try {
+                const { data: staff, error } = await supabaseClient
+                    .from('staff')
+                    .select('*')
+                    .order('display_order', { ascending: true });
+
+                if (error) throw error;
+
+                const container = document.getElementById('staffTable');
+                
+                if (!staff || staff.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No staff members found</div>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Photo</th>
+                                <th>Name</th>
+                                <th>Qualification</th>
+                                <th>Department</th>
+                                <th>Designation</th>
+                                <th>Experience</th>
+                                <th>Order</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${staff.map(s => `
+                                <tr>
+                                    <td>${s.photo_url ? `<img src="${s.photo_url}" class="image-preview" style="width: 50px; height: 50px;">` : '👤'}</td>
+                                    <td>${s.name}</td>
+                                    <td>${s.qualification || '-'}</td>
+                                    <td>${s.department || '-'}</td>
+                                    <td>${s.designation || '-'}</td>
+                                    <td>${s.experience || '-'}</td>
+                                    <td>${s.display_order}</td>
+                                    <td>
+                                        <button class="btn-icon btn-edit" onclick='editStaff(${JSON.stringify(s)})'>✏️</button>
+                                        <button class="btn-icon btn-delete" onclick="deleteStaff('${s.id}')">🗑️</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (err) {
+                console.error('Error loading staff:', err);
+            }
+        }
+
+        function openStaffModal(staff = null) {
+            currentEditItem = staff;
+            const isEdit = staff !== null;
+
+            const modal = createModal(isEdit ? 'Edit Staff' : 'Add Staff', `
+                <form id="staffForm">
+                    <div class="form-group">
+                        <label class="form-label">Name *</label>
+                        <input type="text" class="form-input" id="staffName" value="${staff?.name || ''}" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Qualification</label>
+                            <input type="text" class="form-input" id="staffQualification" value="${staff?.qualification || ''}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Department</label>
+                            <input type="text" class="form-input" id="staffDepartment" value="${staff?.department || ''}">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Designation</label>
+                            <input type="text" class="form-input" id="staffDesignation" value="${staff?.designation || ''}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Experience (years)</label>
+                            <input type="text" class="form-input" id="staffExperience" value="${staff?.experience || ''}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Display Order</label>
+                        <input type="number" class="form-input" id="staffOrder" value="${staff?.display_order || 0}">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Photo URL</label>
+                        <input type="url" class="form-input" id="staffPhoto" value="${staff?.photo_url || ''}" placeholder="https://...">
+                        ${staff?.photo_url ? `<img src="${staff.photo_url}" class="image-preview" id="photoPreview">` : ''}
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn btn-success">${isEdit ? 'Update' : 'Add'} Staff</button>
+                    </div>
+                </form>
+            `);
+
+            modal.show();
+
+            document.getElementById('staffForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveStaff(isEdit);
+            });
+        }
+
+        async function saveStaff(isEdit) {
+            const data = {
+                name: document.getElementById('staffName').value.trim(),
+                qualification: document.getElementById('staffQualification').value.trim(),
+                department: document.getElementById('staffDepartment').value.trim(),
+                designation: document.getElementById('staffDesignation').value.trim(),
+                experience: document.getElementById('staffExperience').value.trim(),
+                display_order: parseInt(document.getElementById('staffOrder').value) || 0,
+                photo_url: document.getElementById('staffPhoto').value.trim() || null
+            };
+
+            try {
+                if (isEdit) {
+                    const { error } = await supabaseClient
+                        .from('staff')
+                        .update(data)
+                        .eq('id', currentEditItem.id);
+
+                    if (error) throw error;
+                    alert('Staff updated successfully');
+                } else {
+                    const { error } = await supabaseClient
+                        .from('staff')
+                        .insert([data]);
+
+                    if (error) throw error;
+                    alert('Staff added successfully');
+                }
+
+                closeModal();
+                loadStaff();
+                loadDashboardStats();
+            } catch (err) {
+                console.error('Error saving staff:', err);
+                alert('Failed to save staff');
+            }
+        }
+
+        function editStaff(staff) {
+            openStaffModal(staff);
+        }
+
+        async function deleteStaff(id) {
+            if (!confirm('Are you sure you want to delete this staff member?')) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('staff')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                alert('Staff deleted successfully');
+                loadStaff();
+                loadDashboardStats();
+            } catch (err) {
+                console.error('Error deleting staff:', err);
+                alert('Failed to delete staff');
+            }
+        }
+
+        // ============================================
+        // INFRASTRUCTURE MANAGEMENT
+        // ============================================
+        async function loadInfrastructure() {
+            try {
+                const { data: infra, error } = await supabaseClient
+                    .from('infrastructure')
+                    .select('*')
+                    .order('display_order', { ascending: true });
+
+                if (error) throw error;
+
+                const container = document.getElementById('infraTable');
+                
+                if (!infra || infra.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No infrastructure found</div>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Visible</th>
+                                <th>Order</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${infra.map(i => `
+                                <tr>
+                                    <td>${i.image_url ? `<img src="${i.image_url}" class="image-preview" style="width: 60px; height: 60px;">` : '🏢'}</td>
+                                    <td>${i.title}</td>
+                                    <td>${i.description ? i.description.substring(0, 50) + '...' : '-'}</td>
+                                    <td><span class="badge badge-${i.is_visible ? 'success' : 'danger'}">${i.is_visible ? 'Visible' : 'Hidden'}</span></td>
+                                    <td>${i.display_order}</td>
+                                    <td>
+                                        <button class="btn-icon btn-edit" onclick='editInfra(${JSON.stringify(i)})'>✏️</button>
+                                        <button class="btn-icon btn-delete" onclick="deleteInfra('${i.id}')">🗑️</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (err) {
+                console.error('Error loading infrastructure:', err);
+            }
+        }
+
+        function openInfraModal(infra = null) {
+            currentEditItem = infra;
+            const isEdit = infra !== null;
+
+            const modal = createModal(isEdit ? 'Edit Infrastructure' : 'Add Infrastructure', `
+                <form id="infraForm">
+                    <div class="form-group">
+                        <label class="form-label">Title *</label>
+                        <input type="text" class="form-input" id="infraTitle" value="${infra?.title || ''}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-input" id="infraDescription">${infra?.description || ''}</textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Display Order</label>
+                            <input type="number" class="form-input" id="infraOrder" value="${infra?.display_order || 0}">
+                        </div>
+
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="infraVisible" ${infra?.is_visible !== false ? 'checked' : ''}>
+                            <label for="infraVisible">Visible on website</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Image URL</label>
+                        <input type="url" class="form-input" id="infraImage" value="${infra?.image_url || ''}" placeholder="https://...">
+                        ${infra?.image_url ? `<img src="${infra.image_url}" class="image-preview">` : ''}
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn btn-success">${isEdit ? 'Update' : 'Add'} Infrastructure</button>
+                    </div>
+                </form>
+            `);
+
+            modal.show();
+
+            document.getElementById('infraForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveInfra(isEdit);
+            });
+        }
+
+        async function saveInfra(isEdit) {
+            const data = {
+                title: document.getElementById('infraTitle').value.trim(),
+                description: document.getElementById('infraDescription').value.trim() || null,
+                display_order: parseInt(document.getElementById('infraOrder').value) || 0,
+                is_visible: document.getElementById('infraVisible').checked,
+                image_url: document.getElementById('infraImage').value.trim() || null
+            };
+
+            try {
+                if (isEdit) {
+                    const { error } = await supabaseClient
+                        .from('infrastructure')
+                        .update(data)
+                        .eq('id', currentEditItem.id);
+
+                    if (error) throw error;
+                    alert('Infrastructure updated successfully');
+                } else {
+                    const { error } = await supabaseClient
+                        .from('infrastructure')
+                        .insert([data]);
+
+                    if (error) throw error;
+                    alert('Infrastructure added successfully');
+                }
+
+                closeModal();
+                loadInfrastructure();
+                loadDashboardStats();
+            } catch (err) {
+                console.error('Error saving infrastructure:', err);
+                alert('Failed to save infrastructure');
+            }
+        }
+
+        function editInfra(infra) {
+            openInfraModal(infra);
+        }
+
+        async function deleteInfra(id) {
+            if (!confirm('Are you sure you want to delete this infrastructure?')) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('infrastructure')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                alert('Infrastructure deleted successfully');
+                loadInfrastructure();
+                loadDashboardStats();
+            } catch (err) {
+                console.error('Error deleting infrastructure:', err);
+                alert('Failed to delete infrastructure');
+            }
+        }
+
+        // ============================================
+        // GALLERY MANAGEMENT
+        // ============================================
+        async function loadGallery() {
+            try {
+                const { data: gallery, error } = await supabaseClient
+                    .from('gallery')
+                    .select('*')
+                    .order('display_order', { ascending: true });
+
+                if (error) throw error;
+
+                const container = document.getElementById('galleryTable');
+                
+                if (!gallery || gallery.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No gallery images found</div>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Visible</th>
+                                <th>Order</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${gallery.map(g => `
+                                <tr>
+                                    <td><img src="${g.image_url}" class="image-preview" style="width: 80px; height: 80px;"></td>
+                                    <td>${g.title}</td>
+                                    <td><span class="badge badge-primary">${g.category || '-'}</span></td>
+                                    <td><span class="badge badge-${g.is_visible ? 'success' : 'danger'}">${g.is_visible ? 'Visible' : 'Hidden'}</span></td>
+                                    <td>${g.display_order}</td>
+                                    <td>
+                                        <button class="btn-icon btn-edit" onclick='editGallery(${JSON.stringify(g)})'>✏️</button>
+                                        <button class="btn-icon btn-delete" onclick="deleteGallery('${g.id}')">🗑️</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (err) {
+                console.error('Error loading gallery:', err);
+            }
+        }
+
+        function openGalleryModal(gallery = null) {
+            currentEditItem = gallery;
+            const isEdit = gallery !== null;
+
+            const modal = createModal(isEdit ? 'Edit Gallery Image' : 'Add Gallery Image', `
+                <form id="galleryForm">
+                    <div class="form-group">
+                        <label class="form-label">Title *</label>
+                        <input type="text" class="form-input" id="galleryTitle" value="${gallery?.title || ''}" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <input type="text" class="form-input" id="galleryCategory" value="${gallery?.category || ''}" placeholder="e.g., Events, Sports">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Display Order</label>
+                            <input type="number" class="form-input" id="galleryOrder" value="${gallery?.display_order || 0}">
+                        </div>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="galleryVisible" ${gallery?.is_visible !== false ? 'checked' : ''}>
+                        <label for="galleryVisible">Visible on website</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Image URL *</label>
+                        <input type="url" class="form-input" id="galleryImage" value="${gallery?.image_url || ''}" placeholder="https://..." required>
+                        ${gallery?.image_url ? `<img src="${gallery.image_url}" class="image-preview">` : ''}
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn btn-success">${isEdit ? 'Update' : 'Add'} Image</button>
+                    </div>
+                </form>
+            `);
+
+            modal.show();
+
+            document.getElementById('galleryForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveGallery(isEdit);
+            });
+        }
+
+        async function saveGallery(isEdit) {
+            const data = {
+                title: document.getElementById('galleryTitle').value.trim(),
+                category: document.getElementById('galleryCategory').value.trim() || null,
+                display_order: parseInt(document.getElementById('galleryOrder').value) || 0,
+                is_visible: document.getElementById('galleryVisible').checked,
+                image_url: document.getElementById('galleryImage').value.trim()
+            };
+
+            try {
+                if (isEdit) {
+                    const { error } = await supabaseClient
+                        .from('gallery')
+                        .update(data)
+                        .eq('id', currentEditItem.id);
+
+                    if (error) throw error;
+                    alert('Gallery image updated successfully');
+                } else {
+                    const { error } = await supabaseClient
+                        .from('gallery')
+                        .insert([data]);
+
+                    if (error) throw error;
+                    alert('Gallery image added successfully');
+                }
+
+                closeModal();
+                loadGallery();
+                loadDashboardStats();
+            } catch (err) {
+                console.error('Error saving gallery:', err);
+                alert('Failed to save gallery image');
+            }
+        }
+
+        function editGallery(gallery) {
+            openGalleryModal(gallery);
+        }
+
+        async function deleteGallery(id) {
+            if (!confirm('Are you sure you want to delete this image?')) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('gallery')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                alert('Gallery image deleted successfully');
+                loadGallery();
+                loadDashboardStats();
+            } catch (err) {
+                console.error('Error deleting gallery:', err);
+                alert('Failed to delete gallery image');
+            }
+        }
+
+        // ============================================
+        // ACHIEVEMENTS MANAGEMENT
+        // ============================================
+        async function loadAchievements() {
+            try {
+                const { data: achievements, error } = await supabaseClient
+                    .from('achievements')
+                    .select('*')
+                    .order('achievement_date', { ascending: false });
+
+                if (error) throw error;
+
+                const container = document.getElementById('achievementsTable');
+                
+                if (!achievements || achievements.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No achievements found</div>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Date</th>
+                                <th>Visible</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${achievements.map(a => `
+                                <tr>
+                                    <td>${a.image_url ? `<img src="${a.image_url}" class="image-preview" style="width: 60px; height: 60px;">` : '🏆'}</td>
+                                    <td>${a.title}</td>
+                                    <td><span class="badge badge-primary">${a.category || '-'}</span></td>
+                                    <td>${a.achievement_date ? new Date(a.achievement_date).toLocaleDateString() : '-'}</td>
+                                    <td><span class="badge badge-${a.is_visible ? 'success' : 'danger'}">${a.is_visible ? 'Visible' : 'Hidden'}</span></td>
+                                    <td>
+                                        <button class="btn-icon btn-edit" onclick='editAchievement(${JSON.stringify(a)})'>✏️</button>
+                                        <button class="btn-icon btn-delete" onclick="deleteAchievement('${a.id}')">🗑️</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (err) {
+                console.error('Error loading achievements:', err);
+            }
+        }
+
+        function openAchievementModal(achievement = null) {
+            currentEditItem = achievement;
+            const isEdit = achievement !== null;
+
+            const modal = createModal(isEdit ? 'Edit Achievement' : 'Add Achievement', `
+                <form id="achievementForm">
+                    <div class="form-group">
+                        <label class="form-label">Title *</label>
+                        <input type="text" class="form-input" id="achievementTitle" value="${achievement?.title || ''}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-input" id="achievementDescription">${achievement?.description || ''}</textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <select class="form-input" id="achievementCategory">
+                                <option value="Academic" ${achievement?.category === 'Academic' ? 'selected' : ''}>Academic</option>
+                                <option value="Sports" ${achievement?.category === 'Sports' ? 'selected' : ''}>Sports</option>
+                                <option value="Cultural" ${achievement?.category === 'Cultural' ? 'selected' : ''}>Cultural</option>
+                                <option value="Science" ${achievement?.category === 'Science' ? 'selected' : ''}>Science</option>
+                                <option value="Arts" ${achievement?.category === 'Arts' ? 'selected' : ''}>Arts</option>
+                                <option value="Other" ${achievement?.category === 'Other' ? 'selected' : ''}>Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Achievement Date</label>
+                            <input type="date" class="form-input" id="achievementDate" value="${achievement?.achievement_date || ''}">
+                        </div>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="achievementVisible" ${achievement?.is_visible !== false ? 'checked' : ''}>
+                        <label for="achievementVisible">Visible on website</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Image URL</label>
+                        <input type="url" class="form-input" id="achievementImage" value="${achievement?.image_url || ''}" placeholder="https://...">
+                        ${achievement?.image_url ? `<img src="${achievement.image_url}" class="image-preview">` : ''}
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn btn-success">${isEdit ? 'Update' : 'Add'} Achievement</button>
+                    </div>
+                </form>
+            `);
+
+            modal.show();
+
+            document.getElementById('achievementForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveAchievement(isEdit);
+            });
+        }
+
+        async function saveAchievement(isEdit) {
+            const data = {
+                title: document.getElementById('achievementTitle').value.trim(),
+                description: document.getElementById('achievementDescription').value.trim() || null,
+                category: document.getElementById('achievementCategory').value,
+                achievement_date: document.getElementById('achievementDate').value || null,
+                is_visible: document.getElementById('achievementVisible').checked,
+                image_url: document.getElementById('achievementImage').value.trim() || null
+            };
+
+            try {
+                if (isEdit) {
+                    const { error } = await supabaseClient
+                        .from('achievements')
+                        .update(data)
+                        .eq('id', currentEditItem.id);
+
+                    if (error) throw error;
+                    alert('Achievement updated successfully');
+                } else {
+                    const { error } = await supabaseClient
+                        .from('achievements')
+                        .insert([data]);
+
+                    if (error) throw error;
+                    alert('Achievement added successfully! Notification will be sent to users.');
+                }
+
+                closeModal();
+                loadAchievements();
+                loadDashboardStats();
+            } catch (err) {
+                console.error('Error saving achievement:', err);
+                alert('Failed to save achievement');
+            }
+        }
+
+        function editAchievement(achievement) {
+            openAchievementModal(achievement);
+        }
+
+        async function deleteAchievement(id) {
+            if (!confirm('Are you sure you want to delete this achievement?')) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('achievements')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                alert('Achievement deleted successfully');
+                loadAchievements();
+                loadDashboardStats();
+            } catch (err) {
+                console.error('Error deleting achievement:', err);
+                alert('Failed to delete achievement');
+            }
+        }
+
+        // ============================================
+        // BLOGS/NOTICES MANAGEMENT
+        // ============================================
+        async function loadBlogs() {
+            try {
+                const { data: blogs, error } = await supabaseClient
+                    .from('blogs')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                const container = document.getElementById('blogsTable');
+                
+                if (!blogs || blogs.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No notices found</div>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Date</th>
+                                <th>Published</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${blogs.map(b => `
+                                <tr>
+                                    <td>${b.image_url ? `<img src="${b.image_url}" class="image-preview" style="width: 60px; height: 60px;">` : '📢'}</td>
+                                    <td>${b.title}</td>
+                                    <td>${b.author || 'Admin'}</td>
+                                    <td>${new Date(b.created_at).toLocaleDateString()}</td>
+                                    <td><span class="badge badge-${b.is_published ? 'success' : 'danger'}">${b.is_published ? 'Published' : 'Draft'}</span></td>
+                                    <td>
+                                        <button class="btn-icon btn-edit" onclick='editBlog(${JSON.stringify(b)})'>✏️</button>
+                                        <button class="btn-icon btn-delete" onclick="deleteBlog('${b.id}')">🗑️</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (err) {
+                console.error('Error loading blogs:', err);
+            }
+        }
+
+        function openBlogModal(blog = null) {
+            currentEditItem = blog;
+            const isEdit = blog !== null;
+
+            const modal = createModal(isEdit ? 'Edit Notice' : 'Add Notice', `
+                <form id="blogForm">
+                    <div class="form-group">
+                        <label class="form-label">Title *</label>
+                        <input type="text" class="form-input" id="blogTitle" value="${blog?.title || ''}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Content *</label>
+                        <textarea class="form-input" id="blogContent" style="min-height: 150px;" required>${blog?.content || ''}</textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Author</label>
+                            <input type="text" class="form-input" id="blogAuthor" value="${blog?.author || 'Admin'}">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Display Order</label>
+                            <input type="number" class="form-input" id="blogOrder" value="${blog?.display_order || 0}">
+                        </div>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="blogPublished" ${blog?.is_published !== false ? 'checked' : ''}>
+                        <label for="blogPublished">Publish (will send notification to all users)</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Image URL</label>
+                        <input type="url" class="form-input" id="blogImage" value="${blog?.image_url || ''}" placeholder="https://...">
+                        ${blog?.image_url ? `<img src="${blog.image_url}" class="image-preview">` : ''}
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn btn-success">${isEdit ? 'Update' : 'Add'} Notice</button>
+                    </div>
+                </form>
+            `);
+
+            modal.show();
+
+            document.getElementById('blogForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveBlog(isEdit);
+            });
+        }
+
+        async function saveBlog(isEdit) {
+            const data = {
+                title: document.getElementById('blogTitle').value.trim(),
+                content: document.getElementById('blogContent').value.trim(),
+                author: document.getElementById('blogAuthor').value.trim() || 'Admin',
+                display_order: parseInt(document.getElementById('blogOrder').value) || 0,
+                is_published: document.getElementById('blogPublished').checked,
+                image_url: document.getElementById('blogImage').value.trim() || null
+            };
+
+            try {
+                if (isEdit) {
+                    const { error } = await supabaseClient
+                        .from('blogs')
+                        .update(data)
+                        .eq('id', currentEditItem.id);
+
+                    if (error) throw error;
+                    alert('Notice updated successfully');
+                } else {
+                    const { error } = await supabaseClient
+                        .from('blogs')
+                        .insert([data]);
+
+                    if (error) throw error;
+                    alert('Notice added successfully! Notification will be sent to all users.');
+                }
+
+                closeModal();
+                loadBlogs();
+                loadDashboardStats();
+            } catch (err) {
+                console.error('Error saving blog:', err);
+                alert('Failed to save notice');
+            }
+        }
+
+        function editBlog(blog) {
+            openBlogModal(blog);
+        }
+
+        async function deleteBlog(id) {
+            if (!confirm('Are you sure you want to delete this notice?')) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('blogs')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                alert('Notice deleted successfully');
+                loadBlogs();
+                loadDashboardStats();
+            } catch (err) {
+                console.error('Error deleting blog:', err);
+                alert('Failed to delete notice');
+            }
+        }
+
+        // ============================================
+        // NOTIFICATIONS
+        // ============================================
+        async function loadNotifications() {
+            try {
+                const { data: notifications, error } = await supabaseClient
+                    .from('notifications_log')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(50);
+
+                if (error) throw error;
+
+                const container = document.getElementById('notificationsTable');
+                
+                if (!notifications || notifications.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No notifications found</div>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Title</th>
+                                <th>Message</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${notifications.map(n => `
+                                <tr>
+                                    <td><span class="badge badge-primary">${n.notification_type}</span></td>
+                                    <td>${n.title}</td>
+                                    <td>${n.message.substring(0, 50)}...</td>
+                                    <td>${new Date(n.created_at).toLocaleString()}</td>
+                                    <td><span class="badge badge-${n.is_sent ? 'success' : 'warning'}">${n.is_sent ? 'Sent' : 'Pending'}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (err) {
+                console.error('Error loading notifications:', err);
+            }
+        }
+
+        async function sendTestNotification() {
+            if (!confirm('Send a test notification to all subscribed users?')) return;
+
+            try {
+                // Create test notification
+                const { error } = await supabaseClient
+                    .from('notifications_log')
+                    .insert([{
+                        notification_type: 'general',
+                        title: 'Test Notification',
+                        message: 'This is a test notification from HCC School Admin Panel',
+                        is_sent: false
+                    }]);
+
+                if (error) throw error;
+
+                alert('Test notification queued! It will be sent to all subscribers.');
+                loadNotifications();
+            } catch (err) {
+                console.error('Error sending test notification:', err);
+                alert('Failed to send test notification');
+            }
+        }
+
+        // ============================================
+        // MODAL UTILITIES
+        // ============================================
+        function createModal(title, content) {
+            // Remove existing modal
+            const existingModal = document.querySelector('.modal');
+            if (existingModal) existingModal.remove();
+
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">${title}</h3>
+                        <button class="btn-close" onclick="closeModal()">×</button>
+                    </div>
+                    ${content}
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            return {
+                show: () => modal.classList.add('show'),
+                hide: () => modal.classList.remove('show')
+            };
+        }
+
+        function closeModal() {
+            const modal = document.querySelector('.modal');
+            if (modal) {
+                modal.classList.remove('show');
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+
+        // ============================================
+        // TABLE SEARCH/FILTER
+        // ============================================
+        function filterTable(tableId, searchTerm) {
+            const table = document.getElementById(tableId);
+            const rows = table.querySelectorAll('tbody tr');
+            
+            searchTerm = searchTerm.toLowerCase();
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        }
+
+        // Close modal on background click
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                closeModal();
+            }
+        });
+
+
+
+        <!-- Service Worker Registration for Admin -->
+
+    // ============================================
+    // ADMIN SERVICE WORKER REGISTRATION
+    // ============================================
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/admin-sw.js')
+                .then((registration) => {
+                    console.log('✅ Admin SW registered:', registration.scope);
+
+                    // Check for updates every 10 minutes
+                    setInterval(() => {
+                        registration.update();
+                    }, 10 * 60 * 1000);
+
+                    // Listen for updates
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                if (confirm('New version available! Reload to update?')) {
+                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                    window.location.reload();
+                                }
+                            }
+                        });
+                    });
+                })
+                .catch((error) => {
+                    console.error('❌ Admin SW registration failed:', error);
+                });
+
+            // Reload when new SW takes control
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                window.location.reload();
+            });
+        });
+    }
+
+    // ============================================
+    // PUSH NOTIFICATION SUBSCRIPTION FOR ADMIN
+    // ============================================
+    async function subscribeAdminToNotifications() {
+        if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+            console.log('❌ Push notifications not supported');
+            return;
+        }
+
+        try {
+            const permission = await Notification.requestPermission();
+            
+            if (permission !== 'granted') {
+                console.log('❌ Notification permission denied');
+                return;
+            }
+
+            const registration = await navigator.serviceWorker.ready;
+            
+            let subscription = await registration.pushManager.getSubscription();
+
+            if (!subscription) {
+                // VAPID public key (replace with your actual key)
+                const vapidPublicKey = 'BMjWrT4Mo49qpPCXXx_qWNS8VJfVNE5-laD52FT-usDylWdolRBv4qU1EpzdwK-PUAqj2JKB4ZAFvfABhZxMyKs';
+                
+                subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
+                });
+            }
+
+            // Save admin subscription to database
+            await saveAdminSubscription(subscription);
+
+            console.log('✅ Admin subscribed to push notifications');
+        } catch (error) {
+            console.error('❌ Failed to subscribe admin:', error);
+        }
+    }
+
+    // Convert VAPID key
+    function urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding)
+            .replace(/\-/g, '+')
+            .replace(/_/g, '/');
+
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+    }
+
+    // Save admin subscription
+    async function saveAdminSubscription(subscription) {
+        const subscriptionJson = subscription.toJSON();
+
+        const { error } = await supabaseClient
+            .from('push_subscriptions')
+            .upsert({
+                endpoint: subscription.endpoint,
+                p256dh: subscriptionJson.keys.p256dh,
+                auth: subscriptionJson.keys.auth,
+                user_agent: 'Admin Panel - ' + navigator.userAgent,
+                device_type: 'admin',
+                is_active: true,
+                last_used: new Date().toISOString()
+            }, {
+                onConflict: 'endpoint'
+            });
+
+        if (error) {
+            console.error('❌ Failed to save admin subscription:', error);
+        }
+    }
+
+    // Auto-subscribe admin after login
+    window.addEventListener('DOMContentLoaded', () => {
+        const session = localStorage.getItem('adminSession');
+        if (session) {
+            // Wait 3 seconds after login, then subscribe
+            setTimeout(() => {
+                subscribeAdminToNotifications();
+            }, 3000);
+        }
+    });
+
+    </script>
+</body>
+</html>

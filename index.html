@@ -3560,6 +3560,39 @@ function showImagePreview(file, previewElementId) {
     reader.readAsDataURL(file);
 }
 
+ if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then((registration) => {
+                    console.log('✅ SW registered:', registration.scope);
+
+                    // Check for updates every 5 minutes
+                    setInterval(() => {
+                        registration.update();
+                    }, 5 * 60 * 1000);
+
+                    // Listen for updates
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                if (confirm('New version available! Reload to update?')) {
+                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                    window.location.reload();
+                                }
+                            }
+                        });
+                    });
+                })
+                .catch((error) => console.error('❌ SW registration failed:', error));
+
+            // Reload when new SW takes control
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                window.location.reload();
+            });
+        });
+    }
+
     </script>
 </body>
 </html>

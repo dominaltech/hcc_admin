@@ -1,7 +1,7 @@
 {
-  "name": "hcc-school-website",
+  "name": "hcc-admin-panel",
   "version": "1.0.0",
-  "description": "HCC High School Website with Admin Panel",
+  "description": "HCC School Admin Panel",
   "dependencies": {
     "web-push": "^3.6.7",
     "@supabase/supabase-js": "^2.39.0"

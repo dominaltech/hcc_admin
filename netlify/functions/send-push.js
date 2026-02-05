@@ -1,16 +1,15 @@
 // ============================================
 // NETLIFY FUNCTION: SEND PUSH NOTIFICATIONS
+// Automatically sends push when called
 // ============================================
 
 const webpush = require('web-push');
 const { createClient } = require('@supabase/supabase-js');
 
-// ============================================
-// ENVIRONMENT VARIABLES (Set in Netlify)
-// ============================================
+// Environment variables from Netlify
 const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY;
 const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
-const VAPID_SUBJECT = process.env.VAPID_SUBJECT;
+const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:admin@hccschool.edu.in';
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 
@@ -21,24 +20,40 @@ webpush.setVapidDetails(
     VAPID_PRIVATE_KEY
 );
 
-// Initialize Supabase client
+// Initialize Supabase
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
 // ============================================
 // MAIN HANDLER
 // ============================================
 exports.handler = async (event, context) => {
-    // Only allow POST requests
+    console.log('🔔 Push notification function called');
+
+    // Allow CORS
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Content-Type': 'application/json'
+    };
+
+    // Handle OPTIONS request
+    if (event.httpMethod === 'OPTIONS') {
+        return { statusCode: 200, headers, body: '' };
+    }
+
+    // Only allow POST
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
+            headers,
             body: JSON.stringify({ error: 'Method not allowed' })
         };
     }
 
     try {
-        // Parse request body
-        const { notificationId, type } = JSON.parse(event.body);
+        // Parse request
+        const { notificationId, sendAll } = JSON.parse(event.body || '{}');
 
         let notifications = [];
 
@@ -52,78 +67,80 @@ exports.handler = async (event, context) => {
 
             if (error) throw error;
             notifications = [data];
-        } else if (type === 'pending') {
+        } else if (sendAll) {
             // Send all pending notifications
             const { data, error } = await supabase
                 .from('notifications_log')
                 .select('*')
                 .eq('is_sent', false)
                 .order('created_at', { ascending: true })
-                .limit(50);
+                .limit(20);
 
             if (error) throw error;
             notifications = data || [];
         } else {
             return {
                 statusCode: 400,
-                body: JSON.stringify({ error: 'Missing notificationId or type=pending' })
+                headers,
+                body: JSON.stringify({ error: 'Missing notificationId or sendAll parameter' })
             };
         }
 
         if (notifications.length === 0) {
             return {
                 statusCode: 200,
+                headers,
                 body: JSON.stringify({ 
+                    success: true,
                     message: 'No notifications to send',
                     sent: 0
                 })
             };
         }
 
-        // Get all active subscriptions
+        // Get active admin subscriptions
         const { data: subscriptions, error: subError } = await supabase
             .from('push_subscriptions')
             .select('*')
-            .eq('is_active', true);
+            .eq('is_active', true)
+            .eq('device_type', 'admin');
 
         if (subError) throw subError;
 
         if (!subscriptions || subscriptions.length === 0) {
+            console.log('⚠️ No admin subscriptions found');
             return {
                 statusCode: 200,
+                headers,
                 body: JSON.stringify({ 
-                    message: 'No active subscriptions',
+                    success: true,
+                    message: 'No active admin subscriptions',
                     sent: 0
                 })
             };
         }
 
+        console.log(`📤 Sending to ${subscriptions.length} admin devices`);
+
         let totalSent = 0;
         let failedSubscriptions = [];
 
-        // Send each notification to all subscribers
+        // Send each notification
         for (const notification of notifications) {
             const payload = JSON.stringify({
-                title: notification.title,
-                body: notification.message,
+                title: notification.title || 'HCC Admin Alert',
+                body: notification.message || 'New notification',
                 icon: '/icons/icon-192x192.png',
                 badge: '/icons/icon-96x96.png',
                 url: notification.notification_data?.url || '/',
-                data: notification.notification_data
+                data: notification.notification_data || {},
+                tag: 'admin-notification',
+                requireInteraction: true,
+                vibrate: [200, 100, 200, 100, 200]
             });
 
-            // Filter subscriptions based on notification type
-            let targetSubscriptions = subscriptions;
-            
-            // Admin-only notifications (admission inquiries)
-            if (notification.notification_data?.admin_only) {
-                targetSubscriptions = subscriptions.filter(sub => 
-                    sub.device_type === 'admin'
-                );
-            }
-
-            // Send to all target subscriptions
-            for (const subscription of targetSubscriptions) {
+            // Send to all admin subscriptions
+            for (const subscription of subscriptions) {
                 try {
                     const pushSubscription = {
                         endpoint: subscription.endpoint,
@@ -135,17 +152,18 @@ exports.handler = async (event, context) => {
 
                     await webpush.sendNotification(pushSubscription, payload);
                     totalSent++;
+                    console.log(`✅ Sent to ${subscription.endpoint.substring(0, 50)}...`);
 
-                    // Update last_used timestamp
+                    // Update last_used
                     await supabase
                         .from('push_subscriptions')
                         .update({ last_used: new Date().toISOString() })
                         .eq('id', subscription.id);
 
                 } catch (error) {
-                    console.error('Failed to send to subscription:', error);
+                    console.error('❌ Failed to send:', error.message);
                     
-                    // If subscription is invalid (410 Gone), mark as inactive
+                    // If subscription expired (410 Gone)
                     if (error.statusCode === 410) {
                         failedSubscriptions.push(subscription.id);
                         await supabase
@@ -165,23 +183,22 @@ exports.handler = async (event, context) => {
 
         return {
             statusCode: 200,
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers,
             body: JSON.stringify({
                 success: true,
                 message: 'Notifications sent successfully',
                 sent: totalSent,
                 notifications: notifications.length,
-                subscribers: targetSubscriptions?.length || 0,
-                failedSubscriptions: failedSubscriptions.length
+                subscribers: subscriptions.length,
+                failed: failedSubscriptions.length
             })
         };
 
     } catch (error) {
-        console.error('Error sending push notifications:', error);
+        console.error('❌ Error:', error);
         return {
             statusCode: 500,
+            headers,
             body: JSON.stringify({ 
                 error: 'Failed to send notifications',
                 details: error.message 
